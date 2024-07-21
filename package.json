@@ -5,11 +5,30 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "dev": "vue-cli-service serve"
   },
   "dependencies": {
+    "@lemonadejs/signature": "^2.2.1",
+    "@mdi/font": "^7.4.47",
+    "@mui/icons-material": "^5.16.4",
+    "@mui/material": "^5.16.4",
+    "@primevue/themes": "^4.0.0",
+    "@vercel/postgres": "^0.9.0",
+    "@vercel/python": "^4.3.0",
+    "axios": "^1.7.2",
     "core-js": "^3.8.3",
-    "vue": "^3.2.13"
+    "material-icons": "^1.13.12",
+    "material-symbols": "^0.21.2",
+    "primeflex": "^3.3.1",
+    "primeicons": "^7.0.0",
+    "primevue": "^3.53.0",
+    "vue": "^3.2.13",
+    "vue-mq": "^1.0.1",
+    "vue-router": "^4.0.13",
+    "vue-signature": "^2.6.0",
+    "vue3-signature": "^0.2.4",
+    "vue3-signature-pad": "^1.0.7"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
@@ -17,8 +36,11 @@
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
+    "connect-history-api-fallback": "^2.0.0",
     "eslint": "^7.32.0",
-    "eslint-plugin-vue": "^8.0.3"
+    "eslint-plugin-vue": "^8.0.3",
+    "sass": "^1.77.8",
+    "sass-loader": "^14.2.1"
   },
   "eslintConfig": {
     "root": true,
