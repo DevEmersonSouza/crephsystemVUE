@@ -26,15 +26,12 @@ export default {
 </script>
 
 <style scoped>
-.custom-class {
-}
-
 
 /* Adicione estilos conforme necessário */
 button {
   /* Estilos para o botão */
   color: rgb(0, 0, 0);
-  background-color: rgb(224, 156, 156);
+  background-color: rgb(207, 139, 139);
   border: none;
   cursor: pointer;
   height: 4em;

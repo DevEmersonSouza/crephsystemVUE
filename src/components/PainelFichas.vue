@@ -86,21 +86,10 @@ export default {
 };
 </script>
 
-<style>
-button {
-  color: white;
-  background-color: darkblue;
-  border: 1px solid #2196F3;
-  /* width: 10em; */
-}
-
-button:hover {
-  color: darkblue;
-  background-color: white;
-}
-
+<style scoped>
 @media (max-width: 576px) {
     button{
+      width: 6em;
   }
 }
 

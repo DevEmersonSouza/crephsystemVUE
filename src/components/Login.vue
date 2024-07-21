@@ -53,7 +53,7 @@
             :loading="loading"
           />
         </form>
-        <p v-if="errorMessage">{{ errorMessage }}</p>
+        <p class="text-center" v-if="errorMessage">{{ errorMessage }}</p>
       </div>
     </div>
   </div>
@@ -116,12 +116,12 @@ export default {
             }
             return; // Sai da função após login bem-sucedido
           } else {
-            this.errorMessage = "Aguarde...";
+            this.errorMessage = "Credenciais Incorretas";
             return; // Sai da função se houver erro de resposta
           }
         } catch (error) {
           console.error("Erro ao tentar fazer login:", error);
-          this.errorMessage = "Aguarde...";
+          this.errorMessage = ("Aguarde...");
           tentativasRestantes--;
           this.loading = false;
           await new Promise((resolve) => setTimeout(resolve, 1000)); // Pausa antes de tentar novamente

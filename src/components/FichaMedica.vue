@@ -27,8 +27,13 @@
     <div class="card">
       <div class="flex flex-column justify-content-center">
         <h2 class="text-center" v-if="selectedPmaName">Fichas Médicas no {{ selectedPmaName }}</h2>
+        <div class="flex justify-content-end gap-2 mb-4">
+          <Calendar v-model="selectedDate" placeholder="Selecione a data" @change="applyDateFilter" dateFormat="dd/mm/yy" showIcon />
+          <Button label="Filtrar" @click="applyDateFilter" />
+          <Button label="Limpar Filtro" @click="clearFilter" />
+        </div>
         <DataTable
-          :value="fichasMedicas"
+          :value="filteredFichasMedicas"
           dataKey="id"
           :expandedRows="expandedRows"
           @rowExpand="onRowExpand"
@@ -67,19 +72,29 @@
               </div>
             </div>
           </template>
-          <Column expander :header="'expandir'" />
+          <Column expander class="w-1" :header="'expandir'" />
           <Column
             :field="'hora_entrada'"
             :header="'Hora de Entrada'"
             :sortable="true"
-            class="text-center"
+            class="text-center w-1"
           ></Column>
+          <Column
+            :field="'data'"
+            :header="'Data do Atendimento'"
+            :sortable="true"
+            class="text-center w-1"
+          >
+          <template #body="slotProps">
+              {{ formatarData(slotProps.data.data) }}
+            </template>    
+          </Column>
           <Column
             :field="'nome_paciente'"
             :header="'Nome do Paciente'"
             :sortable="true"
             :body="expandableBodyTemplate"
-            class="text-center"
+            class="text-center w-2"
           ></Column>
           <Column :header="'Idade'" :sortable="true" class="text-center">
             <template #body="slotProps">
@@ -90,7 +105,7 @@
             :field="'sexo'"
             :header="'Sexo'"
             :sortable="true"
-            class="text-center"
+            class="text-center w-1"
           ></Column>
           <Column
             :field="'queixas'"
@@ -98,7 +113,7 @@
             :sortable="true"
             class="text-center"
           ></Column>
-          <Column :header="'Status'">
+          <Column class="w-1" :header="'Status'">
             <template #body="slotProps">
               <div
                 :class="{
@@ -113,7 +128,7 @@
               </div>
             </template>
           </Column>
-          <Column :header="'Ações'" class="text-center">
+          <Column  :header="'Ações'" class="text-center w-1">
             <template #body="slotProps">
               <div class="flex flex-column align-items-center">
                 <Button
@@ -392,7 +407,6 @@
                   <InputText
                     id="evolucao"
                     v-model="editFormData.observacao"
-                    required
                   />
                 </div>
                 <div class="flex">
@@ -432,13 +446,17 @@ import InputText from "primevue/inputtext";
 import InputGroupAddon from "primevue/inputgroupaddon";
 import Dialog  from "primevue/dialog";
 import ProgressSpinner from "primevue/progressspinner";
+import Calendar from "primevue/calendar";
+
 const fichasMedicas = ref([]);
+const filteredFichasMedicas = ref([]);
 const expandedRows = ref({});
 const editMode = ref({});
 const editFormData = ref({});
 const isDivVisible = ref(false);
 const selectedPmaName = ref("");
 const loading = ref(false); // Inicializa como string vazia
+const selectedDate = ref(new Date()); // Armazena a data selecionada para o filtro
 
 const toggleDiv = () => {
   isDivVisible.value = !isDivVisible.value;
@@ -454,21 +472,31 @@ const back = () => {
 
 const fetchFichasMedicas = async () => {
   const pmaId = localStorage.getItem("pma_id");
+  const date = selectedDate.value;
+
   if (!pmaId) {
     console.error("pma_id não encontrado no localStorage.");
     loading.value = false;
     return;
   }
+
+  if (!date) {
+    console.error("Data não selecionada.");
+    loading.value = false;
+    return;
+  }
+
   let tentativasRestantes = 2;
   while (tentativasRestantes > 0) {
     try {
       loading.value = true;
       const response = await fetch(
-        `https://backendcreph.onrender.com/api/fichas-medicas/${pmaId}`
+        `https://backendcreph.onrender.com/api/fichas-medicas/${pmaId}?date=${date}`
       );
       const data = await response.json();
       fichasMedicas.value = data;
       console.log(data);
+      applyDateFilter(); // Aplica o filtro de data por padrão
       setSelectedPmaName(); // Chama função para definir o nome do PMA
       loading.value = false;
       return;
@@ -488,9 +516,33 @@ const fetchFichasMedicas = async () => {
 
 const formatarData = (dataString) => {
   const data = new Date(dataString);
-  return data.toLocaleDateString('pt-BR'); // Formata a data para o padrão brasileiro
+  // Ajusta a data para o fuso horário local
+  data.setMinutes(data.getMinutes() + data.getTimezoneOffset());
+  return data.toLocaleDateString('pt-BR');
 };
 
+const applyDateFilter = () => {
+  if (selectedDate.value) {
+    const filtered = fichasMedicas.value.filter(ficha => {
+      const fichaDate = new Date(ficha.data);
+      // Ajusta a data para o fuso horário local
+      fichaDate.setMinutes(fichaDate.getMinutes() + fichaDate.getTimezoneOffset());
+      return (
+        fichaDate.getDate() === selectedDate.value.getDate() &&
+        fichaDate.getMonth() === selectedDate.value.getMonth() &&
+        fichaDate.getFullYear() === selectedDate.value.getFullYear()
+      );
+    });
+    filteredFichasMedicas.value = filtered;
+  } else {
+    filteredFichasMedicas.value = fichasMedicas.value;
+  }
+};
+
+const clearFilter = () => {
+  selectedDate.value = null;
+  filteredFichasMedicas.value = fichasMedicas.value;
+};
 
 const excluirFicha = async (idFicha) => {
   if (confirm("Tem certeza que deseja excluir esta ficha médica?")) {
